@@ -13,18 +13,15 @@
     });
   }
   apply(chosen || (system.matches ? 'dark' : 'light'));
-  // Delegation works even when the host inserts the page after DOMContentLoaded.
-  document.addEventListener('click', event => {
-    const button = event.target.closest?.('[data-theme-choice]');
-    const theme = button?.dataset.themeChoice;
-    if (theme !== 'light' && theme !== 'dark') return;
-    chosen = theme;
-    apply(chosen);
-    try { localStorage.setItem(key, chosen); } catch {}
+  document.addEventListener('DOMContentLoaded', () => {
+    apply(document.documentElement.dataset.theme);
+    document.querySelectorAll('[data-theme-choice]').forEach(button => {
+      button.addEventListener('click', () => {
+        chosen = button.dataset.themeChoice;
+        apply(chosen);
+        try { localStorage.setItem(key, chosen); } catch {}
+      });
+    });
   });
-  const syncButtons = () => apply(chosen || (system.matches ? 'dark' : 'light'));
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', syncButtons, { once: true });
-  } else { syncButtons(); }
   system.addEventListener('change', () => { if (!chosen) apply(system.matches ? 'dark' : 'light'); });
 })();
