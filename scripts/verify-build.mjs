@@ -1,0 +1,18 @@
+import { readFile, readdir } from 'node:fs/promises';
+import assert from 'node:assert/strict';
+const root = new URL('../', import.meta.url);
+const site = JSON.parse(await readFile(new URL('site.config.json', root), 'utf8'));
+const out = new URL('dist/public/', root);
+const html = await readFile(new URL('index.html', out), 'utf8');
+for (const key of ['og:title', 'og:description', 'og:type', 'og:url', 'og:image', 'og:image:alt', 'og:image:width', 'og:image:height', 'twitter:card', 'twitter:image']) assert.ok(html.includes(`"${key}"`), key);
+assert.ok(html.includes(`rel="canonical" href="${site.publicUrl}"`));
+assert.ok(html.includes(`content="${site.publicUrl}og-image.png"`));
+assert.ok(html.includes(`base href="${new URL(site.publicUrl).pathname}"`));
+const png = await readFile(new URL('og-image.png', out));
+assert.equal(png.readUInt32BE(16), 1200); assert.equal(png.readUInt32BE(20), 630);
+const assets = await readdir(out, { recursive: true });
+assert.ok(assets.every(name => !/(\.env|auth\.mjs|server\.mjs|node_modules|\.git)/.test(name)));
+const client = await readFile(new URL('app.js', out), 'utf8');
+assert.doesNotMatch(client, /\bfetch\s*\(|XMLHttpRequest|sendBeacon|localStorage|sessionStorage/);
+assert.ok(html.includes('서버나 외부 AI로 전송하지 않으며 저장하지 않습니다.'));
+console.log('PASS: OG tags, canonical URL, image 1200x630, base path, safe static assets, no review transmission');

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>앗싸, 답글! · 짧은 리뷰에 정성을 담다</title>
+  <meta name="description" content="짧은 고객 리뷰에도 자연스럽게 답하세요. 리뷰 유형과 말투를 고르면 80자 이내 답글 3종을 만들고 복사할 수 있습니다.">
+  <meta name="theme-color" content="#181818"><link rel="icon" href="./mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css"><script type="module" src="./app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">본문으로 바로가기</a>
+  <header class="header"><a class="brand" href="./"><img src="./mark.svg" width="38" height="38" alt=""><span>앗싸, 답글!</span></a><div class="header-actions"><span class="free-label">무료 문장 조합 도구</span></div></header>
+  <main id="main">
+    <p id="boot-status" role="status" class="boot">앱을 준비하고 있어요.</p>
+    <section class="welcome" aria-labelledby="welcome-title">
+      <div class="welcome-message"><p class="overline">짧은 리뷰에도 정성 담긴 답글</p><h1 id="welcome-title">앱을 찾아주셔서<br>고맙습니다.</h1><p class="welcome-purpose">고객의 짧은 한마디에 어떻게 답할지 고민될 때,<br>부담 없이 사용할 수 있는 답글 3개를 만들어 드려요.</p><p class="welcome-note">가입이나 이용코드 없이, 아래에서 바로 시작하세요.</p></div>
+      <div class="usage-guide"><h2>이렇게 사용해 보세요</h2><ol><li><strong>고객 리뷰를 입력하세요</strong><span>이름·전화번호 등 개인정보는 빼 주세요.</span></li><li><strong>느낌과 말투를 골라 주세요</strong><span>실제 주문 메뉴를 넣으면 답글에 반영돼요.</span></li><li><strong>답글을 골라 복사하세요</strong><span>고객의 리뷰와 맞는지 확인한 뒤 사용하세요.</span></li></ol><p>준비된 문장을 조합하는 무료 도구입니다.<br>실제 AI가 리뷰 원문을 해석하는 방식은 아닙니다.</p></div>
+    </section>
+    <section id="workspace" hidden aria-labelledby="workspace-title">
+      <div class="workspace-intro"><div><p class="overline" id="workspace-label">짧은 리뷰에 정성을 담는 도구</p><h2 id="workspace-title">이제, 답글을 만들어 볼까요?</h2><p class="lead">리뷰를 넣고 말투를 골라 보세요. 답글은 짧게, 감사는 자연스럽게.</p></div><div class="stamp"><strong>80<span>자</span></strong><span>이내로 간결하게</span></div></div>
+      <div class="workspace-grid">
+        <section class="input-panel" aria-labelledby="input-title"><div class="panel-heading"><span class="step">1</span><h2 id="input-title">고객의 리뷰를 알려주세요</h2></div>
+          <form id="reply-form">
+            <div class="label-row"><label for="review">고객 리뷰 <span class="required">필수</span></label><span id="review-count">0 / 500자</span></div>
+            <textarea id="review" name="review" rows="4" required placeholder="예: 잘 먹고 갑니다" aria-describedby="review-help review-count"></textarea>
+            <p id="review-help" class="field-help">이름·전화번호 등 개인정보는 빼 주세요.</p>
+            <div class="examples"><span>예시로 시작</span><button type="button" data-example="positive">잘 먹고 갑니다</button><button type="button" data-example="concern">조금 아쉬웠어요</button></div>
+            <fieldset><legend>리뷰의 느낌 <span class="required">직접 선택</span></legend><div class="choice-row"><label><input type="radio" name="sentiment" value="positive" required><span>만족해요</span></label><label><input type="radio" name="sentiment" value="neutral"><span>담담해요</span></label><label><input type="radio" name="sentiment" value="concern"><span>아쉬워요</span></label></div></fieldset>
+            <div class="menu-field"><label for="menu">실제 주문 메뉴 <span class="optional">선택</span></label><input id="menu" name="menu" placeholder="예: 김치찌개 · 모르면 비워 두세요" aria-describedby="menu-help"><p id="menu-help" class="field-help">20자 이내. 비워 두면 메뉴명을 지어내지 않아요.</p></div>
+            <fieldset><legend>답글 말투</legend><div class="choice-row tone"><label><input type="radio" name="tone" value="warm" checked><span>따뜻하게 <small>고마워요</small></span></label><label><input type="radio" name="tone" value="formal"><span>정중하게 <small>감사드립니다</small></span></label></div></fieldset>
+            <button id="generate" class="primary" type="submit">답글 3개 만들기 <span aria-hidden="true">✦</span></button><p id="form-error" class="error" role="alert"></p>
+            <p class="mode-note">선택한 유형·메뉴·말투에 맞춰 준비된 문장을 조합해요. 리뷰 원문을 AI가 해석하지는 않아요.</p>
+          </form>
+        </section>
+        <section class="output-panel" aria-labelledby="output-title"><div class="panel-heading"><span class="step">2</span><h2 id="output-title" tabindex="-1">마음에 드는 답글을 골라요</h2></div><p class="output-sub">복사한 뒤, 고객의 리뷰와 맞는지 한 번 더 읽어 주세요.</p>
+          <div id="empty-state" class="empty-state"><div class="empty-quotes" aria-hidden="true">“ ”</div><h3>짧고 자연스럽게,<br>세 가지 답글을 준비할게요.</h3><p>왼쪽에 리뷰를 입력해 주세요.<br>휴대전화에서는 위쪽에 있어요.</p><div class="empty-directions"><span>감사 중심</span><span>메뉴 언급</span><span>다음 방문 인사</span></div></div>
+          <div id="results" hidden><div id="reply-list"></div><p id="result-note" class="field-help"></p><button id="regenerate" type="button" class="secondary">다른 표현 보기 <span id="variant-label">1 / 3</span></button><p id="stale-notice" class="notice" hidden>입력을 바꾸셨어요. ‘답글 3개 만들기’를 눌러 새로 만들어 주세요.</p><p id="copy-status" role="status" class="copy-status"></p>
+            <details class="ai-details"><summary>내 AI에서 원문에 맞게 더 다듬기</summary><p>입력한 리뷰가 포함된 요청문을 복사해 평소 쓰는 AI에 붙여 넣으세요. 외부 서비스의 계정과 이용 한도가 적용됩니다.</p><button type="button" id="copy-prompt" class="secondary">AI 요청문 복사</button><textarea id="prompt-fallback" class="copy-fallback" aria-label="복사할 AI 요청문" readonly hidden></textarea></details>
+          </div>
+        </section>
+      </div>
+      <aside id="next-step" class="next-step" hidden><span class="next-symbol" aria-hidden="true">↗</span><div><p class="overline">다음 한 걸음</p><h2 id="guide-title"></h2><p id="guide-body"></p></div></aside>
+      <details class="privacy"><summary>입력한 리뷰는 어떻게 처리하나요?</summary><p>리뷰와 답글은 이 브라우저 안에서만 처리합니다. 서버나 외부 AI로 전송하지 않으며 저장하지 않습니다. 이용코드나 로그인 없이 사용할 수 있으며, 이용을 위한 쿠키를 새로 저장하지 않습니다. 새로고침하면 입력한 리뷰와 답글은 사라집니다.</p></details>
+    </section>
+  </main>
+  <footer><div class="business-info"><span>AICLab · AI콘텐츠융합연구소 · 대표 김진수</span><a href="mailto:info@aiclab2020.com">info@aiclab2020.com</a></div><p id="book-info" hidden></p><a id="book-purchase" class="book-purchase" hidden rel="noopener noreferrer">도서 구매 안내</a><span>짧은 리뷰일수록 짧고 자연스럽게 답합니다.</span></footer>
+  <noscript>이 앱을 사용하려면 브라우저의 자바스크립트를 켜 주세요.</noscript>
+</body></html>

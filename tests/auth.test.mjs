@@ -1,0 +1,41 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { createAuth, can, SESSION_SECONDS, sessionCookie } from '../src/auth.mjs';
+import { createLimiter } from '../src/limits.mjs';
+const apps = new Map([['app-a', { code: 'first-private-code' }], ['app-b', { code: 'other-private-code' }]]);
+test('each app code unlocks only its own app, including forged roles and cross-app sessions', async () => {
+  const auth = createAuth(apps, 'a-long-test-secret-'.repeat(3));
+  assert.equal(await auth.checkCode('app-a', 'first-private-code'), true);
+  assert.equal(await auth.checkCode('app-b', 'first-private-code'), false);
+  const token = auth.issue('app-a');
+  const session = auth.verify('app-a', token);
+  assert.equal(can(session, 'app-a', 'reply:create'), true);
+  assert.equal(can(session, 'app-b', 'reply:create'), false);
+  assert.equal(can(session, 'app-a', 'admin:write'), false);
+  assert.equal(auth.verify('app-b', token), null);
+  const [data, signature] = token.split('.');
+  const claims = JSON.parse(Buffer.from(data, 'base64url').toString()); claims.role = 'admin';
+  assert.equal(auth.verify('app-a', `${Buffer.from(JSON.stringify(claims)).toString('base64url')}.${signature}`), null);
+  assert.equal(auth.verify('app-a', `${token}extra`), null);
+});
+test('expiry, app-code rotation, and private cookie scope', () => {
+  const secret = 'rotation-secret-'.repeat(3);
+  const auth = createAuth(apps, secret);
+  const now = 1_000_000;
+  assert.equal(auth.verify('app-a', auth.issue('app-a', now), now + SESSION_SECONDS * 1000), null);
+  const tokenA = auth.issue('app-a'); const tokenB = auth.issue('app-b');
+  const changed = createAuth(new Map([['app-a', { code: 'new-private-code' }], ['app-b', apps.get('app-b')]]), secret);
+  assert.equal(changed.verify('app-a', tokenA), null);
+  assert.ok(changed.verify('app-b', tokenB));
+  assert.match(sessionCookie('app-a', 'token', true), /HttpOnly; SameSite=Strict/);
+  assert.match(sessionCookie('app-a', 'token', true), /Path=\/api\/apps\/app-a/);
+  assert.match(sessionCookie('app-a', 'token', true), /; Secure$/);
+});
+test('limiter expires buckets and rejects over-capacity without dropping current protection', () => {
+  const limiter = createLimiter({ maxKeys: 1 });
+  assert.equal(limiter.take('a', 2, 1000, 100), true);
+  assert.equal(limiter.take('a', 2, 1000, 100), true);
+  assert.equal(limiter.take('a', 2, 1000, 100), false);
+  assert.equal(limiter.take('b', 2, 1000, 100), false);
+  assert.equal(limiter.take('b', 2, 1000, 1100), true);
+});
